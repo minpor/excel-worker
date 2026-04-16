@@ -121,6 +121,8 @@ Then use **`io.github.minpor:excel-worker`** with the `<version>` from that chec
 
 ## Usage
 
+Quick start in 5 JVM languages (Java, Kotlin, Groovy, Scala, Clojure): [`docs/usage-5-languages.html`](docs/usage-5-languages.html).
+
 ### Java
 
 ```java

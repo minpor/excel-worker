@@ -1,0 +1,816 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>excel-worker — Quick Start (5 JVM languages)</title>
+  <style>
+    :root {
+      --bg: #0f1419;
+      --surface: #1a2332;
+      --surface-2: #243044;
+      --text: #e8eef5;
+      --muted: #8b9cb3;
+      --accent: #3d9eff;
+      --accent-2: #7c5cff;
+      --success: #34d399;
+      --border: rgba(255, 255, 255, 0.08);
+      --radius: 12px;
+      --font: system-ui, "Segoe UI", Roboto, Ubuntu, sans-serif;
+      --mono: ui-monospace, "Cascadia Code", "Fira Code", Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font);
+      color: var(--text);
+      background:
+        radial-gradient(ellipse 120% 80% at 50% -20%, rgba(61, 158, 255, 0.18), transparent 50%),
+        radial-gradient(ellipse 80% 50% at 100% 50%, rgba(124, 92, 255, 0.12), transparent 45%),
+        var(--bg);
+      line-height: 1.55;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    code {
+      font-family: var(--mono);
+      font-size: 0.92em;
+      background: var(--surface-2);
+      padding: 0.15em 0.45em;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .wrap {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 1.25rem 1.25rem 3rem;
+    }
+
+    header.doc-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: clamp(1.35rem, 4vw, 1.75rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 0%, #a8c8ff 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .brand .tagline {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 36rem;
+    }
+
+    .ui-lang {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
+    }
+
+    .ui-lang label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .ui-lang select {
+      appearance: none;
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 2rem 0.5rem 0.75rem;
+      font: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238b9cb3' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.65rem center;
+    }
+
+    .ui-lang select:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    nav.toc {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      margin: 0 -1.25rem 1.5rem;
+      padding: 0.65rem 1.25rem;
+      background: rgba(15, 20, 25, 0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .toc-inner {
+      max-width: 920px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem 1rem;
+    }
+
+    .toc-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-right: 0.25rem;
+    }
+
+    .toc a {
+      font-size: 0.88rem;
+      padding: 0.35rem 0.65rem;
+      border-radius: 8px;
+      color: var(--text);
+      background: var(--surface);
+      border: 1px solid transparent;
+    }
+
+    .toc a:hover {
+      border-color: var(--border);
+      text-decoration: none;
+      background: var(--surface-2);
+    }
+
+    section.card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.35rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    }
+
+    section.card h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    section.card h2::before {
+      content: "";
+      width: 4px;
+      height: 1.1em;
+      border-radius: 2px;
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    }
+
+    section.card p {
+      margin: 0 0 0.75rem;
+      color: #c5d3e5;
+    }
+
+    section.card p:last-child {
+      margin-bottom: 0;
+    }
+
+    .dep-block {
+      margin-top: 0.5rem;
+    }
+
+    pre.dep {
+      margin: 0;
+      padding: 1rem 1.1rem;
+      background: #0c1018;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+
+    pre.dep code {
+      background: none;
+      border: none;
+      padding: 0;
+      font-size: 0.9rem;
+      color: var(--success);
+    }
+
+    /* Code example tabs */
+    .code-tabs {
+      margin-top: 0.5rem;
+    }
+
+    .tablist {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+      margin-bottom: 0;
+      padding: 0;
+      list-style: none;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    .tablist button {
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 500;
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: color 0.15s, background 0.15s, border-color 0.15s;
+    }
+
+    .tablist button:hover {
+      color: var(--text);
+      background: var(--surface-2);
+    }
+
+    .tablist button[aria-selected="true"] {
+      color: #fff;
+      background: linear-gradient(135deg, rgba(61, 158, 255, 0.25), rgba(124, 92, 255, 0.2));
+      border-color: rgba(61, 158, 255, 0.45);
+    }
+
+    .tablist button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    .panels {
+      margin-top: 0.75rem;
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel[aria-hidden="false"] {
+      display: block;
+    }
+
+    pre.code {
+      margin: 0;
+      padding: 1rem 1.1rem;
+      background: #0c1018;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      line-height: 1.45;
+    }
+
+    pre.code code {
+      display: block;
+      background: none;
+      border: none;
+      padding: 0;
+      color: #d4e4f7;
+      white-space: pre;
+    }
+
+    ul.limits {
+      margin: 0;
+      padding-left: 1.25rem;
+      color: #c5d3e5;
+    }
+
+    ul.limits li {
+      margin-bottom: 0.4rem;
+    }
+
+    footer.doc-foot {
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    @media (max-width: 560px) {
+      .ui-lang {
+        align-items: flex-start;
+        width: 100%;
+      }
+
+      .ui-lang select {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="doc-header">
+      <div class="brand">
+        <h1 data-i18n="title">excel-worker — Quick Start</h1>
+        <p class="tagline" data-i18n="tagline">A lightweight Java 21+ library for reading .xlsx files: sheets, rows, and typed cell values (text, number, boolean, empty).</p>
+      </div>
+      <div class="ui-lang">
+        <label for="ui-lang-select" data-i18n="ui_lang_label">Page language</label>
+        <select id="ui-lang-select" aria-label="Interface language">
+          <option value="en">English</option>
+          <option value="ru">Русский</option>
+          <option value="de">Deutsch</option>
+          <option value="es">Español</option>
+          <option value="fr">Français</option>
+        </select>
+      </div>
+    </header>
+
+    <nav class="toc" aria-label="On this page">
+      <div class="toc-inner">
+        <span class="toc-title" data-i18n="nav_label">On this page</span>
+        <a href="#intro" data-i18n="nav_intro">Introduction</a>
+        <a href="#dependency" data-i18n="nav_dep">Dependency</a>
+        <a href="#examples" data-i18n="nav_code">Code examples</a>
+        <a href="#cellvalue" data-i18n="nav_cellvalue">cellValue()</a>
+        <a href="#limitations" data-i18n="nav_limits">Limitations</a>
+      </div>
+    </nav>
+
+    <main>
+      <section id="intro" class="card">
+        <h2 data-i18n="h_intro">Introduction</h2>
+        <p data-i18n="intro_body">Add the library to a JVM project (Gradle or Maven), then open a workbook with <code>Xlsx.read(Path)</code> and iterate sheets, rows, and cells. Pick a language tab below for a minimal example.</p>
+      </section>
+
+      <section id="dependency" class="card">
+        <h2 data-i18n="h_dep">Dependency (JitPack)</h2>
+        <p data-i18n="dep_p">Declare the JitPack repository and this coordinate (replace the version with a tag or commit from the project):</p>
+        <div class="dep-block">
+          <pre class="dep"><code>com.github.minpor:excel-worker:v0.1.4</code></pre>
+        </div>
+      </section>
+
+      <section id="examples" class="card">
+        <h2 data-i18n="h_examples">Code examples</h2>
+        <p data-i18n="examples_p">Same API on the JVM — choose a tab to see the pattern in your language.</p>
+
+        <div class="code-tabs">
+          <div role="tablist" class="tablist" aria-label="Programming language">
+            <button type="button" role="tab" id="tab-java" aria-selected="true" aria-controls="panel-java">Java</button>
+            <button type="button" role="tab" id="tab-kotlin" aria-selected="false" aria-controls="panel-kotlin">Kotlin</button>
+            <button type="button" role="tab" id="tab-groovy" aria-selected="false" aria-controls="panel-groovy">Groovy</button>
+            <button type="button" role="tab" id="tab-scala" aria-selected="false" aria-controls="panel-scala">Scala</button>
+            <button type="button" role="tab" id="tab-clojure" aria-selected="false" aria-controls="panel-clojure">Clojure</button>
+          </div>
+
+          <div class="panels">
+            <div id="panel-java" role="tabpanel" aria-labelledby="tab-java" aria-hidden="false">
+              <pre class="code"><code>import io.github.minpor.excel.*;
+import java.nio.file.Path;
+
+XlsxWorkbook wb = Xlsx.read(Path.of("report.xlsx"));
+for (XlsxSheet sheet : wb.sheets()) {
+    for (XlsxRow row : sheet.rows()) {
+        for (var cell : row.cellsByColumn().values()) {
+            switch (cell.value()) {
+                case CellValue.Empty e -> {}
+                case CellValue.Text t -> System.out.println(t.value());
+                case CellValue.NumberValue n -> System.out.println(n.value());
+                case CellValue.BooleanValue b -> System.out.println(b.value());
+            }
+        }
+    }
+}</code></pre>
+            </div>
+            <div id="panel-kotlin" role="tabpanel" aria-labelledby="tab-kotlin" aria-hidden="true" hidden>
+              <pre class="code"><code>import io.github.minpor.excel.CellValue
+import io.github.minpor.excel.Xlsx
+import java.nio.file.Path
+
+val wb = Xlsx.read(Path.of("report.xlsx"))
+for (sheet in wb.sheets()) {
+    for (row in sheet.rows()) {
+        for (cell in row.cellsByColumn().values) {
+            when (val v = cell.value()) {
+                is CellValue.Empty -> {}
+                is CellValue.Text -> println(v.value())
+                is CellValue.NumberValue -> println(v.value())
+                is CellValue.BooleanValue -> println(v.value())
+            }
+        }
+    }
+}</code></pre>
+            </div>
+            <div id="panel-groovy" role="tabpanel" aria-labelledby="tab-groovy" aria-hidden="true" hidden>
+              <pre class="code"><code>import io.github.minpor.excel.*
+import java.nio.file.Path
+
+def wb = Xlsx.read(Path.of("report.xlsx"))
+wb.sheets().each { sheet ->
+    sheet.rows().each { row ->
+        row.cellsByColumn().values().each { cell ->
+            def v = cell.value()
+            if (v instanceof CellValue.Text) println(v.value())
+            else if (v instanceof CellValue.NumberValue) println(v.value())
+            else if (v instanceof CellValue.BooleanValue) println(v.value())
+        }
+    }
+}</code></pre>
+            </div>
+            <div id="panel-scala" role="tabpanel" aria-labelledby="tab-scala" aria-hidden="true" hidden>
+              <pre class="code"><code>import io.github.minpor.excel.*
+import java.nio.file.Path
+import scala.jdk.CollectionConverters.*
+
+val wb = Xlsx.read(Path.of("report.xlsx"))
+for
+  sheet <- wb.sheets().asScala
+  row <- sheet.rows().asScala
+  cell <- row.cellsByColumn().values().asScala
+do
+  cell.value() match
+    case t: CellValue.Text => println(t.value())
+    case n: CellValue.NumberValue => println(n.value())
+    case b: CellValue.BooleanValue => println(b.value())
+    case _: CellValue.Empty => ()</code></pre>
+            </div>
+            <div id="panel-clojure" role="tabpanel" aria-labelledby="tab-clojure" aria-hidden="true" hidden>
+              <pre class="code"><code>(import '[io.github.minpor.excel Xlsx CellValue]
+        '[java.nio.file Path])
+
+(def wb (Xlsx/read (Path/of "report.xlsx")))
+(doseq [sheet (.sheets wb)
+        row (.rows sheet)
+        cell (.values (.cellsByColumn row))]
+  (let [v (.value cell)]
+    (cond
+      (instance? CellValue$Text v) (println (.value ^CellValue$Text v))
+      (instance? CellValue$NumberValue v) (println (.value ^CellValue$NumberValue v))
+      (instance? CellValue$BooleanValue v) (println (.value ^CellValue$BooleanValue v))
+      :else nil)))</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="cellvalue" class="card">
+        <h2 data-i18n="h_cellvalue">Fixed columns: cellValue()</h2>
+        <p data-i18n="cellvalue_p">Sparse rows do not use <code>null</code> for missing columns: <code>row.cellValue(index)</code> returns <code>CellValue.EMPTY</code>. Columns are 0-based; <code>ExcelColumns.columnIndex</code> maps A→0, B→1, … <code>CellValues</code> reads text/number/boolean without coercion.</p>
+
+        <div class="code-tabs">
+          <div role="tablist" class="tablist" aria-label="Programming language">
+            <button type="button" role="tab" id="tab-cv-java" aria-selected="true" aria-controls="panel-cv-java">Java</button>
+            <button type="button" role="tab" id="tab-cv-kotlin" aria-selected="false" aria-controls="panel-cv-kotlin">Kotlin</button>
+            <button type="button" role="tab" id="tab-cv-groovy" aria-selected="false" aria-controls="panel-cv-groovy">Groovy</button>
+            <button type="button" role="tab" id="tab-cv-scala" aria-selected="false" aria-controls="panel-cv-scala">Scala</button>
+            <button type="button" role="tab" id="tab-cv-clojure" aria-selected="false" aria-controls="panel-cv-clojure">Clojure</button>
+          </div>
+
+          <div class="panels">
+            <div id="panel-cv-java" role="tabpanel" aria-labelledby="tab-cv-java" aria-hidden="false">
+              <pre class="code"><code>import io.github.minpor.excel.*;
+import java.nio.file.Path;
+
+XlsxWorkbook wb = Xlsx.read(Path.of("report.xlsx"));
+XlsxSheet sheet = wb.sheet("Summary").orElseThrow();
+
+for (XlsxRow row : sheet.rows()) {
+    String name = CellValues.asText(row.cellValue(0)).orElse("");
+    double amount = CellValues.asNumber(row.cellValue(ExcelColumns.columnIndex("C"))).orElse(0.0);
+}</code></pre>
+            </div>
+            <div id="panel-cv-kotlin" role="tabpanel" aria-labelledby="tab-cv-kotlin" aria-hidden="true" hidden>
+              <pre class="code"><code>import io.github.minpor.excel.*
+import java.nio.file.Path
+
+val wb = Xlsx.read(Path.of("report.xlsx"))
+val sheet = wb.sheet("Summary").orElseThrow()
+
+for (row in sheet.rows()) {
+    val name = CellValues.asText(row.cellValue(0)).orElse("")
+    val amount = CellValues.asNumber(row.cellValue(ExcelColumns.columnIndex("C"))).orElse(0.0)
+}</code></pre>
+            </div>
+            <div id="panel-cv-groovy" role="tabpanel" aria-labelledby="tab-cv-groovy" aria-hidden="true" hidden>
+              <pre class="code"><code>import io.github.minpor.excel.*
+import java.nio.file.Path
+
+def wb = Xlsx.read(Path.of("report.xlsx"))
+def sheet = wb.sheet("Summary").orElseThrow()
+sheet.rows().each { row ->
+    def name = CellValues.asText(row.cellValue(0)).orElse("")
+    def amount = CellValues.asNumber(row.cellValue(ExcelColumns.columnIndex("C"))).orElse(0.0)
+}</code></pre>
+            </div>
+            <div id="panel-cv-scala" role="tabpanel" aria-labelledby="tab-cv-scala" aria-hidden="true" hidden>
+              <pre class="code"><code>import io.github.minpor.excel.*
+import java.nio.file.Path
+import scala.jdk.CollectionConverters.*
+
+val wb = Xlsx.read(Path.of("report.xlsx"))
+val sheet = wb.sheet("Summary").orElseThrow()
+for row <- sheet.rows().asScala do
+  val name = CellValues.asText(row.cellValue(0)).orElse("")
+  val amount = CellValues.asNumber(row.cellValue(ExcelColumns.columnIndex("C"))).orElse(0.0)</code></pre>
+            </div>
+            <div id="panel-cv-clojure" role="tabpanel" aria-labelledby="tab-cv-clojure" aria-hidden="true" hidden>
+              <pre class="code"><code>(import '[io.github.minpor.excel Xlsx CellValues ExcelColumns]
+        '[java.nio.file Path])
+
+(let [wb (Xlsx/read (Path/of "report.xlsx"))
+      sheet (.orElseThrow (.sheet wb "Summary"))]
+  (doseq [row (.rows sheet)]
+    (let [name (.orElse (CellValues/asText (.cellValue row 0)) "")
+          amount (.orElse (CellValues/asNumber
+                             (.cellValue row (ExcelColumns/columnIndex "C")))
+                    0.0)]
+      (println name amount))))</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="limitations" class="card">
+        <h2 data-i18n="h_limits">Current limitations</h2>
+        <ul class="limits">
+          <li data-i18n="lim_1"><code>.xlsx</code> only; legacy <code>.xls</code> is not supported.</li>
+          <li data-i18n="lim_2">Read-only — writing workbooks is not supported.</li>
+          <li data-i18n="lim_3">Date/time values may appear as numeric serials (<code>CellValue.NumberValue</code>).</li>
+        </ul>
+      </section>
+    </main>
+
+    <footer class="doc-foot">
+      <span data-i18n="footer">excel-worker — JVM quick start</span>
+    </footer>
+  </div>
+
+  <script>
+    (function () {
+      const I18N = {
+        en: {
+          docTitle: "excel-worker — Quick Start (5 JVM languages)",
+          title: "excel-worker — Quick Start",
+          tagline: "A lightweight Java 21+ library for reading .xlsx files: sheets, rows, and typed cell values (text, number, boolean, empty).",
+          ui_lang_label: "Page language",
+          nav_label: "On this page",
+          nav_intro: "Introduction",
+          nav_dep: "Dependency",
+          nav_code: "Code examples",
+          nav_cellvalue: "cellValue()",
+          nav_limits: "Limitations",
+          h_intro: "Introduction",
+          intro_body: "Add the library to a JVM project (Gradle or Maven), then open a workbook with Xlsx.read(Path) and iterate sheets, rows, and cells. Pick a language tab below for a minimal example.",
+          h_dep: "Dependency (JitPack)",
+          dep_p: "Declare the JitPack repository and this coordinate (replace the version with a tag or commit from the project):",
+          h_examples: "Code examples",
+          examples_p: "Excel workbook API on the JVM — choose a tab to see the same sheet/row/cell flow in your language.",
+          h_cellvalue: "Missing cells: cellValue()",
+          cellvalue_p: "If an Excel row has gaps (for example A and C are filled, but B is empty), then <code>row.cellValue(index)</code> for that column returns <code>CellValue.EMPTY</code>, not <code>null</code>. Column indexes are 0-based: A→0, B→1, etc. <code>ExcelColumns.columnIndex(...)</code> converts Excel letters to indexes, and <code>CellValues</code> extracts text/number/boolean without coercion.",
+          h_limits: "Current limitations",
+          lim_1: ".xlsx only; legacy .xls is not supported.",
+          lim_2: "Read-only — writing workbooks is not supported.",
+          lim_3: "Date/time values may appear as numeric serials (CellValue.NumberValue).",
+          footer: "excel-worker — Excel .xlsx quick start"
+        },
+        ru: {
+          docTitle: "excel-worker — Быстрый старт (5 языков JVM)",
+          title: "excel-worker — Быстрый старт",
+          tagline: "Лёгкая библиотека на Java 21+ для чтения .xlsx: листы, строки и типизированные значения ячеек (текст, число, логическое, пусто).",
+          ui_lang_label: "Язык страницы",
+          nav_label: "На этой странице",
+          nav_intro: "Введение",
+          nav_dep: "Зависимость",
+          nav_code: "Примеры кода",
+          nav_cellvalue: "cellValue()",
+          nav_limits: "Ограничения",
+          h_intro: "Введение",
+          intro_body: "Подключите библиотеку к JVM-проекту (Gradle или Maven), затем откройте книгу через Xlsx.read(Path) и обходите листы, строки и ячейки. Ниже выберите вкладку с языком для минимального примера.",
+          h_dep: "Зависимость (JitPack)",
+          dep_p: "Укажите репозиторий JitPack и эту координату (версию замените на тег или коммит из проекта):",
+          h_examples: "Примеры кода",
+          examples_p: "Excel API на JVM — откройте вкладку и посмотрите одинаковый сценарий: книга, листы, строки, ячейки.",
+          h_cellvalue: "Пустые ячейки: cellValue()",
+          cellvalue_p: "Если в строке Excel есть пропуски (например, заполнены A и C, а B пустая), то <code>row.cellValue(index)</code> для пустой колонки вернет <code>CellValue.EMPTY</code>, а не <code>null</code>. Нумерация колонок начинается с нуля: A→0, B→1 и т.д. Метод <code>ExcelColumns.columnIndex(...)</code> помогает переводить буквенные колонки в индекс.",
+          h_limits: "Текущие ограничения",
+          lim_1: "Только .xlsx; старый формат .xls не поддерживается.",
+          lim_2: "Только чтение — запись книг не поддерживается.",
+          lim_3: "Даты и время могут отображаться как числовые серии (CellValue.NumberValue).",
+          footer: "excel-worker — быстрый старт по Excel .xlsx"
+        },
+        de: {
+          docTitle: "excel-worker — Schnellstart (5 JVM-Sprachen)",
+          title: "excel-worker — Schnellstart",
+          tagline: "Eine schlanke Java-21+-Bibliothek zum Lesen von .xlsx-Dateien: Blätter, Zeilen und typisierte Zellwerte (Text, Zahl, Boolean, leer).",
+          ui_lang_label: "Sprache der Seite",
+          nav_label: "Auf dieser Seite",
+          nav_intro: "Einführung",
+          nav_dep: "Abhängigkeit",
+          nav_code: "Codebeispiele",
+          nav_cellvalue: "cellValue()",
+          nav_limits: "Einschränkungen",
+          h_intro: "Einführung",
+          intro_body: "Binden Sie die Bibliothek in Ihr JVM-Projekt (Gradle oder Maven) ein, öffnen Sie die Arbeitsmappe mit Xlsx.read(Path) und iterieren Sie über Blätter, Zeilen und Zellen. Wählen Sie unten eine Registerkarte für ein Mindestbeispiel.",
+          h_dep: "Abhängigkeit (JitPack)",
+          dep_p: "JitPack-Repository und diese Koordinate angeben (Version durch Tag oder Commit aus dem Projekt ersetzen):",
+          h_examples: "Codebeispiele",
+          examples_p: "Excel-API auf der JVM — wählen Sie eine Registerkarte, um den gleichen Ablauf mit Arbeitsmappe, Blättern, Zeilen und Zellen zu sehen.",
+          h_cellvalue: "Leere Zellen: cellValue()",
+          cellvalue_p: "Wenn eine Excel-Zeile Lücken hat (z. B. A und C sind belegt, B ist leer), dann liefert <code>row.cellValue(index)</code> für diese Spalte <code>CellValue.EMPTY</code> statt <code>null</code>. Spaltenindizes sind 0-basiert: A→0, B→1 usw. <code>ExcelColumns.columnIndex(...)</code> wandelt Excel-Buchstaben in Indizes um, und <code>CellValues</code> liest Text/Zahl/Bool ohne Typumwandlung.",
+          h_limits: "Aktuelle Einschränkungen",
+          lim_1: "Nur .xlsx; älteres .xls wird nicht unterstützt.",
+          lim_2: "Nur Lesen — Schreiben von Arbeitsmappen wird nicht unterstützt.",
+          lim_3: "Datum/Zeit können als numerische Serien erscheinen (CellValue.NumberValue).",
+          footer: "excel-worker — Schnellstart für Excel .xlsx"
+        },
+        es: {
+          docTitle: "excel-worker — Inicio rápido (5 lenguajes JVM)",
+          title: "excel-worker — Inicio rápido",
+          tagline: "Biblioteca ligera en Java 21+ para leer .xlsx: hojas, filas y valores tipados (texto, número, booleano, vacío).",
+          ui_lang_label: "Idioma de la página",
+          nav_label: "En esta página",
+          nav_intro: "Introducción",
+          nav_dep: "Dependencia",
+          nav_code: "Ejemplos de código",
+          nav_cellvalue: "cellValue()",
+          nav_limits: "Limitaciones",
+          h_intro: "Introducción",
+          intro_body: "Añada la biblioteca a un proyecto JVM (Gradle o Maven), abra el libro con Xlsx.read(Path) e itere hojas, filas y celdas. Elija una pestaña abajo para un ejemplo mínimo.",
+          h_dep: "Dependencia (JitPack)",
+          dep_p: "Declare el repositorio JitPack y esta coordenada (sustituya la versión por una etiqueta o commit del proyecto):",
+          h_examples: "Ejemplos de código",
+          examples_p: "API de Excel en la JVM: elija una pestaña para ver el mismo flujo con libro, hojas, filas y celdas.",
+          h_cellvalue: "Celdas vacias: cellValue()",
+          cellvalue_p: "Si una fila de Excel tiene huecos (por ejemplo, A y C tienen valor y B esta vacia), entonces <code>row.cellValue(index)</code> para esa columna devuelve <code>CellValue.EMPTY</code>, no <code>null</code>. Los indices son base 0: A→0, B→1, etc. <code>ExcelColumns.columnIndex(...)</code> convierte letras de Excel a indices, y <code>CellValues</code> extrae texto/numero/booleano sin coercion.",
+          h_limits: "Limitaciones actuales",
+          lim_1: "Solo .xlsx; el formato antiguo .xls no está soportado.",
+          lim_2: "Solo lectura — no se admite escribir libros.",
+          lim_3: "Las fechas y horas pueden aparecer como series numéricas (CellValue.NumberValue).",
+          footer: "excel-worker — inicio rápido para Excel .xlsx"
+        },
+        fr: {
+          docTitle: "excel-worker — Démarrage rapide (5 langages JVM)",
+          title: "excel-worker — Démarrage rapide",
+          tagline: "Bibliothèque légère Java 21+ pour lire des .xlsx : feuilles, lignes et valeurs typées (texte, nombre, booléen, vide).",
+          ui_lang_label: "Langue de la page",
+          nav_label: "Sur cette page",
+          nav_intro: "Introduction",
+          nav_dep: "Dépendance",
+          nav_code: "Exemples de code",
+          nav_cellvalue: "cellValue()",
+          nav_limits: "Limites",
+          h_intro: "Introduction",
+          intro_body: "Ajoutez la bibliothèque à un projet JVM (Gradle ou Maven), ouvrez le classeur avec Xlsx.read(Path) et parcourez feuilles, lignes et cellules. Choisissez un onglet ci-dessous pour un exemple minimal.",
+          h_dep: "Dépendance (JitPack)",
+          dep_p: "Déclarez le dépôt JitPack et cette coordonnée (remplacez la version par un tag ou un commit du projet) :",
+          h_examples: "Exemples de code",
+          examples_p: "API Excel sur la JVM : choisissez un onglet pour voir le même flux classeur/feuilles/lignes/cellules.",
+          h_cellvalue: "Cellules vides : cellValue()",
+          cellvalue_p: "Si une ligne Excel contient des trous (par exemple A et C sont remplies, mais B est vide), alors <code>row.cellValue(index)</code> pour cette colonne renvoie <code>CellValue.EMPTY</code>, et non <code>null</code>. Les indices de colonnes commencent a 0 : A→0, B→1, etc. <code>ExcelColumns.columnIndex(...)</code> convertit les lettres Excel en indices, et <code>CellValues</code> lit texte/nombre/booleen sans coercition.",
+          h_limits: "Limites actuelles",
+          lim_1: ".xlsx uniquement ; l’ancien .xls n’est pas pris en charge.",
+          lim_2: "Lecture seule — l’écriture de classeurs n’est pas prise en charge.",
+          lim_3: "Les dates/heures peuvent apparaître comme séries numériques (CellValue.NumberValue).",
+          footer: "excel-worker — démarrage rapide Excel .xlsx"
+        }
+      };
+
+      function escapeHtml(s) {
+        return s
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;");
+      }
+
+      function setUiLang(lang) {
+        const t = I18N[lang] || I18N.en;
+        document.documentElement.lang = lang === "en" ? "en" : lang;
+        document.title = t.docTitle;
+
+        document.querySelectorAll("[data-i18n]").forEach(function (el) {
+          const key = el.getAttribute("data-i18n");
+          if (!key || !t[key]) return;
+          const text = t[key];
+          if (key.startsWith("lim_")) {
+            const parts = text.split(/(\.xlsx|\.xls|CellValue\.NumberValue)/g);
+            let html = "";
+            parts.forEach(function (part) {
+              if (part === ".xlsx" || part === ".xls" || part === "CellValue.NumberValue") {
+                html += "<code>" + escapeHtml(part) + "</code>";
+              } else {
+                html += escapeHtml(part);
+              }
+            });
+            el.innerHTML = html;
+          } else if (key === "intro_body") {
+            el.innerHTML = text.replace(/Xlsx\.read\(Path\)/g, "<code>Xlsx.read(Path)</code>");
+          } else if (key === "cellvalue_p") {
+            el.innerHTML = text;
+          } else {
+            el.textContent = text;
+          }
+        });
+
+        try {
+          localStorage.setItem("excel-worker-doc-lang", lang);
+        } catch (e) {}
+      }
+
+      const select = document.getElementById("ui-lang-select");
+      let initial = "en";
+      try {
+        const saved = localStorage.getItem("excel-worker-doc-lang");
+        if (saved && I18N[saved]) initial = saved;
+      } catch (e) {}
+      select.value = initial;
+      setUiLang(initial);
+
+      select.addEventListener("change", function () {
+        setUiLang(select.value);
+      });
+
+      /* Tabs: one independent group per .code-tabs */
+      function initCodeTabs(container) {
+        const tabButtons = container.querySelectorAll('[role="tab"]');
+        const panels = container.querySelectorAll('[role="tabpanel"]');
+
+        function activateTab(activeBtn) {
+          const panelId = activeBtn.getAttribute("aria-controls");
+          tabButtons.forEach(function (btn) {
+            const sel = btn === activeBtn;
+            btn.setAttribute("aria-selected", sel ? "true" : "false");
+            btn.tabIndex = sel ? 0 : -1;
+          });
+          panels.forEach(function (panel) {
+            const show = panel.id === panelId;
+            panel.setAttribute("aria-hidden", show ? "false" : "true");
+            panel.hidden = !show;
+          });
+        }
+
+        if (tabButtons.length) {
+          activateTab(tabButtons[0]);
+        }
+
+        tabButtons.forEach(function (btn) {
+          btn.addEventListener("click", function () {
+            activateTab(btn);
+          });
+          btn.addEventListener("keydown", function (e) {
+            const keys = ["ArrowLeft", "ArrowRight", "Home", "End"];
+            if (keys.indexOf(e.key) === -1) return;
+            const list = Array.prototype.slice.call(tabButtons);
+            const i = list.indexOf(document.activeElement);
+            if (i === -1) return;
+            let next = i;
+            if (e.key === "ArrowRight") next = (i + 1) % list.length;
+            else if (e.key === "ArrowLeft") next = (i - 1 + list.length) % list.length;
+            else if (e.key === "Home") next = 0;
+            else if (e.key === "End") next = list.length - 1;
+            e.preventDefault();
+            list[next].focus();
+            activateTab(list[next]);
+          });
+        });
+      }
+
+      document.querySelectorAll(".code-tabs").forEach(initCodeTabs);
+    })();
+  </script>
+</body>
+</html>
