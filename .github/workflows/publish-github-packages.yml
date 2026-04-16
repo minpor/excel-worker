@@ -1,8 +1,10 @@
 # Publishes the Maven artifact to GitHub Packages (see repo "Packages" tab).
 # JitPack (jitpack.io) is separate and does not populate this registry.
 #
-# If deploy fails with 401: repo Settings → Actions → General → Workflow permissions
-# must be "Read and write permissions" (not read-only), or use a PAT (secret below).
+# Auth: GitHub Packages expects Basic auth. We write settings-ci.xml explicitly and pass -s
+# because setup-java-generated ~/.m2/settings.xml can still yield 401 with maven-deploy-plugin.
+#
+# Optional secret PACKAGES_WRITE_TOKEN = classic PAT with write:packages (if GITHUB_TOKEN is blocked).
 name: Publish to GitHub Packages
 
 on:
@@ -11,7 +13,6 @@ on:
       - 'v*'
   workflow_dispatch:
 
-# Default GITHUB_TOKEN must be allowed to write packages (see comment above).
 permissions:
   contents: read
   packages: write
@@ -27,17 +28,39 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-          server-id: github
-          # repository_owner matches maven.pkg.github.com/OWNER/repo URL; actor is usually the same.
-          server-username: ${{ github.repository_owner }}
-          # Optional: create repo secret PACKAGES_WRITE_TOKEN = PAT with write:packages if GITHUB_TOKEN is read-only.
-          server-password: ${{ secrets.PACKAGES_WRITE_TOKEN || secrets.GITHUB_TOKEN }}
 
-      # Without +x, Linux runners often fail with "Permission denied" on ./mvnw
+      - name: Write Maven settings for GitHub Packages
+        env:
+          MAVEN_USERNAME: ${{ github.actor }}
+          MAVEN_PASSWORD: ${{ secrets.PACKAGES_WRITE_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          python3 << 'PY'
+          import os
+          from pathlib import Path
+
+          workspace = Path(os.environ["GITHUB_WORKSPACE"])
+          user = os.environ["MAVEN_USERNAME"]
+          token = os.environ["MAVEN_PASSWORD"]
+          path = workspace / "settings-ci.xml"
+          # CDATA avoids XML escaping issues in tokens; id must match pom distributionManagement/repository/id.
+          xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+            <servers>
+              <server>
+                <id>github</id>
+                <username>{user}</username>
+                <password><![CDATA[{token}]]></password>
+              </server>
+            </servers>
+          </settings>
+          """
+          path.write_text(xml, encoding="utf-8")
+          PY
+
       - name: Make Maven Wrapper executable
         run: chmod +x mvnw
 
       - name: Deploy to GitHub Packages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./mvnw --batch-mode -e deploy
+        run: ./mvnw --batch-mode -e -s "${GITHUB_WORKSPACE}/settings-ci.xml" deploy

@@ -43,7 +43,7 @@ After each **`v*`** tag push, the workflow [publish-github-packages.yml](https:/
 
 Clients must authenticate to GitHub’s Maven registry: a [PAT](https://github.com/settings/tokens) with **`read:packages`** (and for private repos, access to this repo). Configure Maven `~/.m2/settings.xml` with a `<server><id>github</id>…` matching the repository id, or see [Working with the Apache Maven registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry).
 
-**CI `mvn deploy` returns 401 Unauthorized:** In the repository, open **Settings → Actions → General → Workflow permissions** and set **Read and write permissions** for the `GITHUB_TOKEN`. If the repo (or org policy) must stay read-only for workflows, add a repository secret **`PACKAGES_WRITE_TOKEN`** containing a [classic PAT](https://github.com/settings/tokens) with scope **`write:packages`**; the [publish workflow](https://github.com/minpor/excel-worker/blob/main/.github/workflows/publish-github-packages.yml) uses that secret when present.
+**CI `mvn deploy` returns 401 Unauthorized:** First confirm **Settings → Actions → General → Workflow permissions** is **Read and write** (you already need this). The workflow writes a dedicated `settings-ci.xml` and runs `mvn -s …/settings-ci.xml deploy` so credentials match GitHub Packages’ Basic auth. If it still returns 401, add repository secret **`PACKAGES_WRITE_TOKEN`** — a [classic PAT](https://github.com/settings/tokens) with **`write:packages`** — which the [publish workflow](https://github.com/minpor/excel-worker/blob/main/.github/workflows/publish-github-packages.yml) prefers over `GITHUB_TOKEN` when set.
 
 ### JitPack (use directly from GitHub)
 
