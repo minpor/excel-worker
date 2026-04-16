@@ -12,4 +12,13 @@ public record XlsxRow(int rowIndex, NavigableMap<Integer, XlsxCell> cellsByColum
     public XlsxRow {
         cellsByColumn = Collections.unmodifiableNavigableMap(new TreeMap<>(cellsByColumn));
     }
+
+    /**
+     * Value at {@code columnIndex}, or {@link CellValue#EMPTY} if that column has no cell in this row
+     * (sparse row).
+     */
+    public CellValue cellValue(int columnIndex) {
+        XlsxCell c = cellsByColumn.get(columnIndex);
+        return c == null ? CellValue.EMPTY : c.value();
+    }
 }

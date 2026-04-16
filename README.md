@@ -22,7 +22,7 @@ The library is not on **Maven Central** yet. The usual way to consume it **witho
 
 [JitPack](https://jitpack.io) builds this public GitHub repo on demand. You only declare the **`https://jitpack.io`** repository and a dependency — **no** `credentials { }`, **no** `GITHUB_TOKEN`, **no** PAT.
 
-**Coordinates:** JitPack uses `com.github.<GitHub-username>:<repo-name>:<tag-or-commit>`. The version is a **Git tag** (e.g. `v0.1.3`) or commit hash — see [JitPack — excel-worker](https://jitpack.io/#minpor/excel-worker).
+**Coordinates:** JitPack uses `com.github.<GitHub-username>:<repo-name>:<tag-or-commit>`. The version is a **Git tag** (e.g. `v0.1.4`) or commit hash — see [JitPack — excel-worker](https://jitpack.io/#minpor/excel-worker).
 
 ### Kotlin DSL (`build.gradle.kts`)
 
@@ -33,7 +33,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.minpor:excel-worker:v0.1.3")
+    implementation("com.github.minpor:excel-worker:v0.1.4")
 }
 ```
 
@@ -46,7 +46,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.minpor:excel-worker:v0.1.3"
+    implementation "com.github.minpor:excel-worker:v0.1.4"
 }
 ```
 
@@ -84,7 +84,7 @@ Same idea: add JitPack and use **`com.github.minpor`** (not `io.github.minpor`):
 <dependency>
     <groupId>com.github.minpor</groupId>
     <artifactId>excel-worker</artifactId>
-    <version>v0.1.3</version>
+    <version>v0.1.4</version>
 </dependency>
 ```
 
@@ -92,7 +92,7 @@ Same idea: add JitPack and use **`com.github.minpor`** (not `io.github.minpor`):
 
 Only use this if you intentionally depend on artifacts published to GitHub’s registry ([**Packages**](https://github.com/minpor/excel-worker/packages)). You must configure **authentication** ([PAT](https://github.com/settings/tokens) with `read:packages`, or CI secrets). This is **not** needed for normal Gradle/Maven use with JitPack above.
 
-After each **`v*`** tag, CI may publish to `https://maven.pkg.github.com/minpor/excel-worker` with `groupId` **`io.github.minpor`** and version **`0.1.3`** (without `v`).
+After each **`v*`** tag, CI may publish to `https://maven.pkg.github.com/minpor/excel-worker` with `groupId` **`io.github.minpor`** and version **`0.1.4`** (without `v`).
 
 ```xml
 <repositories>
@@ -105,7 +105,7 @@ After each **`v*`** tag, CI may publish to `https://maven.pkg.github.com/minpor/
 <dependency>
     <groupId>io.github.minpor</groupId>
     <artifactId>excel-worker</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
 </dependency>
 ```
 
@@ -143,6 +143,25 @@ for (XlsxSheet sheet : wb.sheets()) {
             }
         }
     }
+}
+```
+
+### Fixed columns (index or Excel letters)
+
+Sparse rows do not return `null` for missing columns: use `XlsxRow.cellValue(int)` and you get `CellValue.EMPTY` when there is no cell in that column. `ExcelColumns.columnIndex("B")` maps `A`→`0`, `B`→`1`, etc. `CellValues` offers strict `Optional` extraction by type (no number-to-string coercion).
+
+```java
+import io.github.minpor.excel.*;
+
+import java.nio.file.Path;
+
+XlsxWorkbook wb = Xlsx.read(Path.of("report.xlsx"));
+XlsxSheet sheet = wb.sheet("Summary").orElseThrow();
+
+for (XlsxRow row : sheet.rows()) {
+    String name = CellValues.asText(row.cellValue(0)).orElse("");
+    double amount = CellValues.asNumber(row.cellValue(ExcelColumns.columnIndex("C"))).orElse(0.0);
+    // ...
 }
 ```
 

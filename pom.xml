@@ -6,7 +6,7 @@
 
     <groupId>io.github.minpor</groupId>
     <artifactId>excel-worker</artifactId>
-    <version>0.1.3</version>
+    <version>0.1.4</version>
     <packaging>jar</packaging>
     <name>excel-worker</name>
     <description>Excel OOXML (.xlsx) reading focused on GraalVM-friendly, reflection-free usage</description>
