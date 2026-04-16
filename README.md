@@ -24,7 +24,7 @@ The project is not yet published to **Maven Central**. Tagged releases match the
 
 [JitPack](#jitpack-use-directly-from-github) and **GitHub Packages** are different: JitPack hosts builds on [jitpack.io](https://jitpack.io); the [**Packages**](https://github.com/minpor/excel-worker/packages) page only lists artifacts published to **this** repository’s Maven registry.
 
-After each **`v*`** tag push, the workflow [publish-github-packages.yml](https://github.com/minpor/excel-worker/blob/main/.github/workflows/publish-github-packages.yml) runs `mvn deploy` to `https://maven.pkg.github.com/minpor/excel-worker`. Use your normal `groupId` **`io.github.minpor`** and the released version (e.g. **`0.1.2`**).
+After each **`v*`** tag push, the workflow [publish-github-packages.yml](https://github.com/minpor/excel-worker/blob/main/.github/workflows/publish-github-packages.yml) runs `mvn deploy` to `https://maven.pkg.github.com/minpor/excel-worker`. Use your normal `groupId` **`io.github.minpor`** and the released version (e.g. **`0.1.3`**).
 
 ```xml
 <repositories>
@@ -37,7 +37,7 @@ After each **`v*`** tag push, the workflow [publish-github-packages.yml](https:/
 <dependency>
     <groupId>io.github.minpor</groupId>
     <artifactId>excel-worker</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3</version>
 </dependency>
 ```
 
@@ -60,11 +60,11 @@ Clients must authenticate to GitHub’s Maven registry: a [PAT](https://github.c
 <dependency>
     <groupId>com.github.minpor</groupId>
     <artifactId>excel-worker</artifactId>
-    <version>v0.1.2</version>
+    <version>v0.1.3</version>
 </dependency>
 ```
 
-Gradle (Kotlin DSL): `maven { url = uri("https://jitpack.io") }` and `implementation("com.github.minpor:excel-worker:v0.1.2")`.
+Gradle (Kotlin DSL): `maven { url = uri("https://jitpack.io") }` and `implementation("com.github.minpor:excel-worker:v0.1.3")`.
 
 ```bash
 mvn clean install
@@ -76,7 +76,7 @@ If you build from a checkout, depend on your local coordinates (`io.github.minpo
 <dependency>
     <groupId>io.github.minpor</groupId>
     <artifactId>excel-worker</artifactId>
-    <version>0.1.2</version>
+    <version>0.1.3</version>
 </dependency>
 ```
 
@@ -86,11 +86,11 @@ Use the same Maven coordinates as a normal JVM dependency when installing to `~/
 
 ```kotlin
 dependencies {
-    implementation("io.github.minpor:excel-worker:0.1.2")
+    implementation("io.github.minpor:excel-worker:0.1.3")
 }
 ```
 
-For **JitPack**, use `com.github.minpor:excel-worker:v0.1.2` and the `jitpack.io` repository (see above).
+For **JitPack**, use `com.github.minpor:excel-worker:v0.1.3` and the `jitpack.io` repository (see above).
 
 For **Kotlin Multiplatform**, this artifact is **JVM-only** for now; call it from a `jvmMain` source set that targets the JVM.
 
