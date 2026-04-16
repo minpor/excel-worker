@@ -6,11 +6,25 @@
 
     <groupId>io.github.minpor</groupId>
     <artifactId>excel-worker</artifactId>
-    <version>0.1.1</version>
+    <version>0.1.2</version>
     <packaging>jar</packaging>
     <name>excel-worker</name>
     <description>Excel OOXML (.xlsx) reading focused on GraalVM-friendly, reflection-free usage</description>
     <url>https://github.com/minpor/excel-worker</url>
+
+    <scm>
+        <connection>scm:git:https://github.com/minpor/excel-worker.git</connection>
+        <developerConnection>scm:git:https://github.com/minpor/excel-worker.git</developerConnection>
+        <url>https://github.com/minpor/excel-worker</url>
+    </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/minpor/excel-worker</url>
+        </repository>
+    </distributionManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
