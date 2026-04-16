@@ -18,31 +18,54 @@ Writing workbooks, legacy `.xls`, full formula engine, rich text, merged cells, 
 
 ## Maven
 
-The project is not yet published to **Maven Central**. Tagged releases (for example **`v0.1.0`**) match the `<version>` in `pom.xml`; clone/checkout the tag and install locally, or depend on the built JAR from your own artifact repository.
+The project is not yet published to **Maven Central**. Tagged releases (for example **`v0.1.1`**) match the `<version>` in `pom.xml`; clone/checkout the tag and install locally, or depend on the built JAR from your own artifact repository.
+
+### JitPack (use directly from GitHub)
+
+[JitPack](https://jitpack.io) builds the library from tags. Add the repository and use JitPack’s group id (`com.github.<user>`), **not** `io.github.minpor`:
+
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+
+<dependency>
+    <groupId>com.github.minpor</groupId>
+    <artifactId>excel-worker</artifactId>
+    <version>v0.1.1</version>
+</dependency>
+```
+
+Gradle (Kotlin DSL): `maven { url = uri("https://jitpack.io") }` and `implementation("com.github.minpor:excel-worker:v0.1.1")`.
 
 ```bash
 mvn clean install
 ```
 
-Then depend on (adjust version to match your `pom.xml`):
+If you build from a checkout, depend on your local coordinates (`io.github.minpor:excel-worker` and the `<version>` from `pom.xml`):
 
 ```xml
 <dependency>
     <groupId>io.github.minpor</groupId>
     <artifactId>excel-worker</artifactId>
-    <version>0.1.0</version>
+    <version>0.1.1</version>
 </dependency>
 ```
 
 ## Gradle (Kotlin DSL)
 
-Use the same Maven coordinates as a normal JVM dependency (Kotlin/JVM compiles to the same bytecode as Java):
+Use the same Maven coordinates as a normal JVM dependency when installing to `~/.m2` (Kotlin/JVM compiles to the same bytecode as Java):
 
 ```kotlin
 dependencies {
-    implementation("io.github.minpor:excel-worker:0.1.0")
+    implementation("io.github.minpor:excel-worker:0.1.1")
 }
 ```
+
+For **JitPack**, use `com.github.minpor:excel-worker:v0.1.1` and the `jitpack.io` repository (see above).
 
 For **Kotlin Multiplatform**, this artifact is **JVM-only** for now; call it from a `jvmMain` source set that targets the JVM.
 

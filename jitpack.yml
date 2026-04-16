@@ -1,0 +1,3 @@
+# JitPack defaults to JDK 8; this project requires Java 21 (sealed types, records).
+jdk:
+  - openjdk21
