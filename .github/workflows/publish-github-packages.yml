@@ -1,5 +1,8 @@
 # Publishes the Maven artifact to GitHub Packages (see repo "Packages" tab).
 # JitPack (jitpack.io) is separate and does not populate this registry.
+#
+# If deploy fails with 401: repo Settings → Actions → General → Workflow permissions
+# must be "Read and write permissions" (not read-only), or use a PAT (secret below).
 name: Publish to GitHub Packages
 
 on:
@@ -8,12 +11,14 @@ on:
       - 'v*'
   workflow_dispatch:
 
+# Default GITHUB_TOKEN must be allowed to write packages (see comment above).
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   publish:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -23,8 +28,10 @@ jobs:
           java-version: '21'
           cache: maven
           server-id: github
-          server-username: ${{ github.actor }}
-          server-password: ${{ secrets.GITHUB_TOKEN }}
+          # repository_owner matches maven.pkg.github.com/OWNER/repo URL; actor is usually the same.
+          server-username: ${{ github.repository_owner }}
+          # Optional: create repo secret PACKAGES_WRITE_TOKEN = PAT with write:packages if GITHUB_TOKEN is read-only.
+          server-password: ${{ secrets.PACKAGES_WRITE_TOKEN || secrets.GITHUB_TOKEN }}
 
       # Without +x, Linux runners often fail with "Permission denied" on ./mvnw
       - name: Make Maven Wrapper executable

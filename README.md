@@ -43,6 +43,8 @@ After each **`v*`** tag push, the workflow [publish-github-packages.yml](https:/
 
 Clients must authenticate to GitHub’s Maven registry: a [PAT](https://github.com/settings/tokens) with **`read:packages`** (and for private repos, access to this repo). Configure Maven `~/.m2/settings.xml` with a `<server><id>github</id>…` matching the repository id, or see [Working with the Apache Maven registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-apache-maven-registry).
 
+**CI `mvn deploy` returns 401 Unauthorized:** In the repository, open **Settings → Actions → General → Workflow permissions** and set **Read and write permissions** for the `GITHUB_TOKEN`. If the repo (or org policy) must stay read-only for workflows, add a repository secret **`PACKAGES_WRITE_TOKEN`** containing a [classic PAT](https://github.com/settings/tokens) with scope **`write:packages`**; the [publish workflow](https://github.com/minpor/excel-worker/blob/main/.github/workflows/publish-github-packages.yml) uses that secret when present.
+
 ### JitPack (use directly from GitHub)
 
 [JitPack](https://jitpack.io) builds the library from tags. Add the repository and use JitPack’s group id (`com.github.<user>`), **not** `io.github.minpor`:
